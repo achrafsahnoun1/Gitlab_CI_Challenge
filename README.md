@@ -12,11 +12,16 @@ ___
 
 ### Etape 2 - Configuration
 ___
-- Forker ce projet 
-- Enregistrer 2 runners **(désactiver les runners partagés)**: 
+- Forker le projet 
+- Enregistrer 2 runners : 
 
-    1. build-runner  : un runner avec executor docker
-    2. deploy-runner : un runner avec executor shell
+    1. build-runner  : un runner avec executor **docker**, portant un tag `docker`
+    2. deploy-runner : un runner avec executor **shell**, portant un tag `shell`
+
+- Désactiver :
+
+    1. Shared runners
+    2. Run untagged jobs
 
 ### Etape 3 - Mise en place de la CI
 ___
