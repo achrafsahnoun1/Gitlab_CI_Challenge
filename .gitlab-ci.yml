@@ -1,0 +1,48 @@
+variables:
+  HUGO_IMAGE: klakegg/hugo:0.107.0-ext-ubuntu-onbuild
+  PROJECT_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  ENVIRONMENT: draft
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature-.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /main|master/'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+      variables:
+        PORT: 8080
+        CONTAINER_NAME: blog-prod
+        ENVIRONMENT: production
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      variables:
+        PORT: 8081
+        CONTAINER_NAME: blog-dev
+        ENVIRONMENT: development
+
+stages:
+  - build
+  - package
+  - deploy
+
+build 🔨:
+  stage: build
+  tags:
+    - docker
+  script:
+    - echo "TODO"
+
+package 📦:
+  stage: package
+  tags:
+    - docker
+  dependencies: # define a list of jobs to fetch artifacts from
+    - build 🔨
+  script:
+    - echo "TODO" 
+
+deploy 🌍:
+  stage: deploy
+  environment: $ENVIRONMENT
+  tags:
+    - shell
+  script:
+    - echo "TODO"
