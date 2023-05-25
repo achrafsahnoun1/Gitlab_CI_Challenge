@@ -34,8 +34,6 @@ package 📦:
   stage: package
   tags:
     - docker
-  dependencies: # define a list of jobs to fetch artifacts from
-    - build 🔨
   script:
     - echo "TODO" 
 
