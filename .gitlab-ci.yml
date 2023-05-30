@@ -12,33 +12,37 @@ workflow:
         PORT: 8080
         CONTAINER_NAME: blog-prod
         ENVIRONMENT: production
+        ARTIFACT_LINK: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_DEFAULT_BRANCH/download?job=build"
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       variables:
-        PORT: 8081
+        PORT: 8082
         CONTAINER_NAME: blog-dev
         ENVIRONMENT: development
+        ARTIFACT_LINK: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME/download?job=build"
 
 stages:
-  - build
-  - package
-  - deploy
+  - build 🔨
+  - package 📦
+  - deploy 🌍
 
-build 🔨:
-  stage: build
+build:
+  stage: build 🔨
   tags:
     - docker
   script:
     - echo "TODO"
 
-package 📦:
-  stage: package
+package:
+  stage: package 📦
   tags:
     - docker
+  variables:
+    HEADER: "PRIVATE-TOKEN: $PRIVATE_TOKEN" # Please create an access token with `read_api` scope 
   script:
     - echo "TODO" 
 
-deploy 🌍:
-  stage: deploy
+deploy:
+  stage: deploy 🌍
   environment: $ENVIRONMENT
   tags:
     - shell

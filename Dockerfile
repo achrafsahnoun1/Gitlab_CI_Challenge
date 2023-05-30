@@ -1,2 +1,7 @@
 FROM nginx:stable-alpine3.17-slim
-COPY public/ /usr/share/nginx/html/
+WORKDIR /tmp
+ARG DOWNLOADER
+RUN apk add curl unzip
+RUN eval $DOWNLOADER
+RUN unzip artifact.zip 
+RUN mv public/* /usr/share/nginx/html
