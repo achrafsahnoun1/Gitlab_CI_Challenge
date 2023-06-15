@@ -2,22 +2,24 @@
 
 # Sujet
 
-Ce kata est un challenge d'automatisation de la livraison et du deploiement d'un site statique hébergé sur un server Nginx.
+Ce kata est un challenge d'automatisation de la livraison et du deploiement d'un site statique hébergé en local au travers d'une instance de conteneur Nginx.
 
-### Etape 1 - Installations
+Forkez le projet 
+
+## Mise en place de la landing zone locale
+### Etape 1 - Installation des dépendances
 ___
 - [Docker](https://docs.docker.com/get-docker/) 
 - [GitLab Runner](https://docs.gitlab.com/runner/install/)
 
-N'hésitez pas à modifier le fichier `config.toml`. 
+Sur Windows modifiez `config.toml` pour utiliser le bon shell. 
 
-### Etape 2 - Configuration
+### Etape 2 - Paramétrage des runners
 ___
-- Forkez le projet 
 - Enregistrez 2 runners : 
 
-    1. build-runner  : un runner avec executor **docker**, portant un tag `docker`
-    2. deploy-runner : un runner avec executor **shell**, portant un tag `shell`
+    1. un runner avec executor **docker**, portant un tag `build-runner`
+    2. un runner avec executor **shell**,  portant un tag `deploy-runner`
 
     ![runners](runners.png)
     Schema 1 : Rôles par runner 
@@ -46,7 +48,7 @@ Voici les objectifs de ce kata :
 - Configurer des runners gitlab
 - Rajouter un tag à un runner
 - Utiliser un `Container Registery` et `Artifact` 
-- Exploiter l'API de Gitlab via un `Access Token`
+- Exploiter l'API de Gitlab via un `Personal Access Token`
 - Revoir les différents moyens pour déclencher un pipeline.
 - Utiliser le rule `workflow` de Gitlab CI
 - Builder de manière dynamique une image `Docker`
