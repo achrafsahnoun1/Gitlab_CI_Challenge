@@ -1,24 +1,9 @@
 variables:
   HUGO_IMAGE: klakegg/hugo:0.107.0-ext-ubuntu-onbuild
-  PROJECT_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
   ENVIRONMENT: draft
-
-workflow:
-  rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^feature-.*$/'
-    - if: '$CI_COMMIT_BRANCH =~ /main|master/'
-    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
-      variables:
-        PORT: 8080
-        CONTAINER_NAME: blog-prod
-        ENVIRONMENT: production
-        ARTIFACT_LINK: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_DEFAULT_BRANCH/download?job=build"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      variables:
-        PORT: 8082
-        CONTAINER_NAME: blog-dev
-        ENVIRONMENT: development
-        ARTIFACT_LINK: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME/download?job=build"
+  GIT_DEPTH: 1
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_DEPTH: 1
 
 stages:
   - build 🔨
@@ -28,23 +13,29 @@ stages:
 build:
   stage: build 🔨
   tags:
-    - docker
+    - build-runner
+  image:
+    name: $HUGO_IMAGE
+    entrypoint: [""]
   script:
     - echo "TODO"
 
 package:
   stage: package 📦
   tags:
-    - docker
-  variables:
-    HEADER: "PRIVATE-TOKEN: $PRIVATE_TOKEN" # Please create an access token with `read_api` scope 
-  script:
-    - echo "TODO" 
+    - build-runner
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  script: 
+    - echo "TODO"
 
 deploy:
   stage: deploy 🌍
-  environment: $ENVIRONMENT
+  environment: 
+    name: $ENVIRONMENT
   tags:
-    - shell
+    - deploy-runner
   script:
     - echo "TODO"
+
