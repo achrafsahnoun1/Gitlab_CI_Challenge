@@ -21,9 +21,6 @@ ___
     1. un runner avec executor **docker**, portant un tag `build-runner`
     2. un runner avec executor **shell**,  portant un tag `deploy-runner`
 
-    ![runners](runners.png)
-    Schema 1 : Rôles par runner 
-
 - Désactivez :
 
     1. Shared runners
@@ -31,14 +28,45 @@ ___
 
 ### Etape 3 - Mise en place de la CI
 ___
-- Gitflow : une branche principale et des branches de features (pas de branch dev)
-    ![gitflow](gitflow.png)
-    Schema 2 : Gitflow
+- Gitflow : une branche principale et des branches de features voir [workflow](.gitlab-ci.yml)
 - 3 stages (see : [gitlab-ci](./.gitlab-ci.yml))
 
-    1. build   : se déclenche uniquement sur une `branche`, génère le contenu statique et le stocke comme artefact pour une durée défini. ⚠️ Le repertoire themes contient des sous-modules, trouvez comment les résoudres dans la CI, et pensez à le mettre en cache.
-    2. package : uniquement dans un context de `merge request` ou `tag` respectant la sémantique de version [semver](https://semver.org/lang/fr), télécharge l'artefact et le met dans une image Nginx.
-    3. deploy  : uniquement dans un context de `merge request` ou `tag` respectant la sémantique de version [semver](https://semver.org/lang/fr), déploie le site en environnement de **développement** si contexte à `merge request` et en environnement de **production** si contexte `tag`.
+    1. build   : se déclanche partout à l'exeption de `merge request` et `tag`. Génère le contenu statique et le stocke comme artefact. 
+    2. package : se déclanche partout à l'exeption de `merge request` et `tag`. Télécharger l'artefact et le met dans une image Nginx.
+    3. deploy  : uniquement dans un context de `merge request` ou `tag` respectant la sémantique de version [SemVer 2.0.0](https://semver.org/lang/fr/spec/v2.0.0.html), déploie le site en environnement de **développement** si contexte à `merge request` et en environnement de **preproduction** ou **production** si contexte `tag`.
+- Comportement attendu du CI
+```mermaid
+flowchart TB
+
+build --push--> artifact
+package --pull--> artifact
+package --push--> image
+deploy --merge request--> blog-dev
+deploy --"tag: vMAJOR.MINOR.PATCH-rcBUILD"--> blog-preprod
+deploy --"tag: vMAJOR.MINOR.PATCH"--> blog-prod
+blog-prod --pull--> image
+blog-preprod --pull--> image
+blog-dev --pull--> image
+
+subgraph "Pipeline"
+build( build ) --> package( package )
+package --> deploy( deploy )
+end
+
+subgraph "Environments"
+blog-dev( developpement )
+blog-preprod( preproduction )
+blog-prod( production )
+end
+
+subgraph "Container Registry"
+image[ registry.gitlab.com/exalt-it-dojo/labo/kata-ops-name-placeholder:$CI_COMMIT_SHA ]
+end
+
+subgraph "Artifacts"
+artifact[ public/ ]
+end
+```
 
 # Objectif & contexte:
 
@@ -47,11 +75,10 @@ Gitlab est une plateforme qui permet de gérer le cycle de vie complet d'un proj
 Voici les objectifs de ce kata : 
 - Configurer des runners gitlab
 - Rajouter un tag à un runner
-- Utiliser un `Container Registery` et `Artifact` 
-- Exploiter l'API de Gitlab via un `Personal Access Token`
+- Utiliser un `Container Registery`, `Artifact` et `Gitlab Environments`
 - Revoir les différents moyens pour déclencher un pipeline.
-- Utiliser le rule `workflow` de Gitlab CI
-- Builder de manière dynamique une image `Docker`
+- Utiliser les rules de Gitlab CI
+- Builder une image `Docker` via Kaniko
 
 # Specification [RFC2119](https://microformats.org/wiki/rfc-2119-fr) du kata
 
@@ -61,14 +88,39 @@ Voici les objectifs de ce kata :
  * L'excutor de **deploy-runner** `peut` être **Kubernetes** pour ceux qui le maîtrisent 
 
 **2. Implémentation de la CI**
- * Le contenu du fichier [gitlab-ci](./.gitlab-ci.yml) `doit` être modifié tout en préservant les valeurs déjà présentes à l'exception du [Job keywords](https://docs.gitlab.com/ee/ci/yaml/#job-keywords) *script*
+ * Le contenu du fichier [gitlab-ci](./.gitlab-ci.yml) `doit` être modifié tout en préservant les valeurs déjà présentes
  * Il est recommandé de rajouter d'autres [Job keywords](https://docs.gitlab.com/ee/ci/yaml/#job-keywords) au fichier [gitlab-ci](./.gitlab-ci.yml)
- * Les job **package** et **deploy** `doit` se lancer uniquement dans un contexte de **tag** [semver](https://semver.org/lang/fr) ou de **merge request**
+ * Les job **deploy** `doit` se lancer uniquement dans un contexte de **tag** [semver](https://semver.org/lang/fr) ou de **merge request**
  * Il est `recommandé` de déployer le conteneur **ngnix** sur la même machine qui fait tourner le runner **deploy-runner**
 
 **3. Modalité de rendu**
 * Une fois que la CI est considéré par le candidat comme étant fonctionnelle, il `doit` le tagguer avec la version **0.0.1**
 * Il `doit` ensuite créer 2 branches nommées : 
     - *feature-1* : pour le rajout de contenu dans [about](./content/about/_index.md) ensuite mettre **draft** à false 
-    - *feature-2* : pour le rajout de contenu dans [caring](./content/caring/_index.md) ensuite mettre **draft** à false 
-* `Doit` finalment présenter un graphe similaire au [schéma 2](./gitflow.png)
+    - *feature-2* : pour le rajout de contenu dans [caring](./content/caring/_index.md) ensuite mettre **draft** à false
+* Mergez les deux branche et `doit` tagguer avec la version **0.0.2-rc1**
+```mermaid
+gitGraph
+   commit
+   commit
+   commit tag: "v0.0.1"
+   branch feature-1
+   branch feature-2
+   checkout feature-1
+   commit
+   commit
+   checkout main
+   merge feature-1
+   checkout feature-2
+   commit
+   checkout main
+   merge feature-2 tag: "v0.0.2-rc1"
+   commit
+   commit
+```
+
+**4. Bonus**
+* Le candidat `peut` déployer ses runners et conteneurs sur le Cloud de son choix en utilisant ansible comme outil de provisionning
+* Le candidat `peut` créer des environnements par feature qui se créent à l'ouverture d'une merge request et qui se détruisent automatiquement après une semaine d'inactivités. Dans ce cas là :
+    - **ENVIRONMENT: "developpement"** `devrait` être remplacé par **ENVIRONMENT: review-$CI_MERGE_REQUEST_IID**
+    - **CONTAINER_NAME: blog-dev** `devrait` être remplacé par **CONTAINER_NAME: blog-dev-$CI_MERGE_REQUEST_IID**
