@@ -28,12 +28,12 @@ ___
 
 ### Etape 3 - Mise en place de la CI
 ___
-- Gitflow : une branche principale et des branches de features voir [workflow](.gitlab-ci.yml)
+- Gitflow : une branche principale et des branches de features
 - 3 stages (see : [gitlab-ci](./.gitlab-ci.yml))
 
     1. build   : se déclanche partout à l'exeption de `merge request` et `tag`. Génère le contenu statique et le stocke comme artefact. 
-    2. package : se déclanche partout à l'exeption de `merge request` et `tag`. Télécharger l'artefact et le met dans une image Nginx.
-    3. deploy  : uniquement dans un context de `merge request` ou `tag` respectant la sémantique de version [SemVer 2.0.0](https://semver.org/lang/fr/spec/v2.0.0.html), déploie le site en environnement de **développement** si contexte à `merge request` et en environnement de **preproduction** ou **production** si contexte `tag`.
+    2. package : se déclanche partout à l'exeption de `merge request` et `tag`. Télécharge l'artefact et le met dans une image Nginx.
+    3. deploy  : uniquement dans un context de `merge request` ou `tag` respectant la sémantique de version [SemVer 2.0.0](https://semver.org/lang/fr/spec/v2.0.0.html), déploie le site en environnement de **développement** si contexte de `merge request` et en environnement de **preproduction** ou **production** si contexte `tag`.
 - Comportement attendu du CI
 ```mermaid
 flowchart TB
@@ -70,7 +70,7 @@ end
 
 # Objectif & contexte:
 
-Gitlab est une plateforme qui permet de gérer le cycle de vie complet d'un projet logiciel, de la planification à la livraison en passant par le développement, le test et le déploiement. Il permet de mettre en place les best practice DevOps, comme le contrôle de version, la collaboration, la conformité et le CI/CD, pour automatiser les processus et accélérer la livraison de valeur. Maitriser les bases de ce type de plateforme est donc primordiale.
+Gitlab est une plateforme qui permet de gérer le cycle de vie complet d'un projet logiciel, de la planification à la livraison en passant par le développement, les tests et le déploiement. Il permet de mettre en place les best practice DevOps, comme le contrôle de version, la collaboration, la conformité et le CI/CD, pour automatiser les processus et accélérer la livraison de valeur. Maitriser les bases de ce type de plateforme est donc primordiale.
 
 Voici les objectifs de ce kata : 
 - Configurer des runners gitlab
