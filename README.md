@@ -4,7 +4,7 @@
 
 Ce kata est un challenge d'automatisation de la livraison et du deploiement d'un site statique hébergé en local au travers d'une instance de conteneur Nginx.
 
-Forkez le projet 
+# Forkez le projet 
 
 ## Mise en place de la landing zone locale
 ### Etape 1 - Installation des dépendances
