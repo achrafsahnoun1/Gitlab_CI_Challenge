@@ -6,6 +6,12 @@ Ce kata est un challenge d'automatisation de la livraison et du deploiement d'un
 
 # Forkez le projet 
 
+Pour tester le lancement d'Hugo sans runners
+```
+git submodule init
+git submodule update
+```
+
 ## Mise en place de la landing zone locale
 ### Etape 1 - Installation des dépendances
 ___
